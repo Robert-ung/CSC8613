@@ -16,3 +16,35 @@ Cette commande liste tous les conteneurs présents sur la machine. Chaque ligne 
 
 ![alt text](../captures/image1.png)
 
+Exercice 2 : Premiers pas avec Docker : images et conteneurs
+
+Question 2.a Expliquez en quelques phrases la différence entre une image Docker et un conteneur Docker.
+
+Une image Docker est un modèle statique qui contient tout ce qui est nécessaire pour exécuter une application : le système de fichiers, les dépendances, la configuration, etc. Elle est immuable.
+
+Un conteneur Docker, au contraire, est une instance en cours d’exécution d’une image. C’est l’image “vivante” : elle possède son propre état, ses processus et son cycle de vie (démarrage, arrêt, suppression).
+
+Question 2.b Exécutez un conteneur très léger basé sur l’image alpine et affichez un message dans la console : docker run alpine echo "Bonjour depuis un conteneur Alpine"
+
+Que se passe-t-il après l'exécution de cette commande ? 
+
+Docker télécharge l’image alpine. Il crée un conteneur basé sur cette image. Le conteneur exécute la commande echo "Bonjour depuis un conteneur Alpine". Le message s’affiche dans la console, puis le conteneur s’arrête immédiatement.
+
+![alt text](../captures/image2.png)
+
+Question 2.c Listez à nouveau les conteneurs présents sur votre machine : docker ps -a
+
+![alt text](../captures/image3.png)
+
+On observe un conteneur basé sur l’image alpine avec son statut Exited. Le conteneur alpine apparaît comme “Exited” car il a terminé son unique tâche (echo) et n’a plus de processus actif. 
+
+Question 2.d Lancez un conteneur interactif basé sur Alpine : docker run -it alpine sh
+
+À l’intérieur du conteneur, tapez les commandes suivantes : 
+ls
+uname -a
+exit
+
+![alt text](../captures/image4.png)
+
+En mode interactif, on peut manipuler le conteneur comme une petite machine Linux. À l’intérieur du conteneur, ls affiche le contenu minimal du système de fichiers Alpine (binaires de base, répertoires système). uname -a affiche les informations du noyau Linux de ma machine hôte car le conteneur partage le noyau de l’OS. exit ferme la session et arrête le conteneur.
