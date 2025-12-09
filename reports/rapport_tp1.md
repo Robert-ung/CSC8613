@@ -48,3 +48,33 @@ exit
 ![alt text](../captures/image4.png)
 
 En mode interactif, on peut manipuler le conteneur comme une petite machine Linux. À l’intérieur du conteneur, ls affiche le contenu minimal du système de fichiers Alpine (binaires de base, répertoires système). uname -a affiche les informations du noyau Linux de ma machine hôte car le conteneur partage le noyau de l’OS. exit ferme la session et arrête le conteneur.
+
+Exercice 3 : Construire une première image Docker avec une mini-API FastAPI
+
+Question 3.a  Complétez le code afin que l’API expose une route /health qui renvoie un JSON {"status": "ok"}. 
+
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
+
+Question 3.b Complétez les lignes marquées # TODO. 
+
+FROM python:3.11-slim
+
+WORKDIR /app
+
+COPY app.py /app
+
+RUN pip install fastapi uvicorn
+
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+
+Question 3.c Construisez maintenant l’image Docker à partir du Dockerfile avec la commande suivante : docker build -t simple-api .
+
+![alt text](../captures/image5.png)
+
+La construction s'est bien déroulée !
