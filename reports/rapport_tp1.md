@@ -152,3 +152,35 @@ Question 5.e  Lorsque vous avez terminé, arrêtez et supprimez les conteneurs g
 Expliquez dans votre rapport la différence entre : Arrêter les services avec docker compose down ; Arrêter un conteneur individuel avec docker stop <id>.
 
 J’ai arrêté proprement les services avec la commande docker compose down. Cette commande supprime tous les conteneurs, réseaux et ressources créés par Docker Compose pour cette stack. La différence avec docker stop <id> est que docker stop arrête uniquement un conteneur individuel, sans supprimer les ressources associées, tandis que docker compose down gère l’ensemble des services définis dans le fichier docker-compose.yml et remet l’environnement dans un état propre.
+
+Exercice 6 : Interagir avec la base de données PostgreSQL dans un conteneur
+
+Question 6.a  Utilisez la commande suivante pour ouvrir un shell psql à l’intérieur du conteneur PostgreSQL : docker compose exec db psql -U demo -d demo
+Expliquez dans votre rapport le rôle de chaque option (exec, db, -U, -d). 
+
+L’option exec permet d’exécuter une commande à l’intérieur d’un conteneur déjà en cours d’exécution. Le mot db correspond au nom du service défini dans le fichier docker-compose.yml. L’option -U demo indique l’utilisateur PostgreSQL à utiliser pour la connexion, et -d demo précise le nom de la base de données. Cette commande ouvre un shell interactif psql directement dans le conteneur.
+
+Question 6.b Une fois connecté à psql, exécutez les commandes suivantes : SELECT version(); Puis : SELECT current_database();
+Notez dans votre rapport les résultats obtenus, et ajoutez une capture d’écran de la session psql. 
+
+![alt text](../captures/image9.png)
+
+SELECT version() affiche la version de PostgreSQL installée dans le conteneur.SELECT current_database() renvoie le nom de la base de données courante, qui est bien demo. Ces résultats confirment que la base est opérationnelle et que la connexion fonctionne.
+
+PostgreSQL 16.11 (Debian 16.11-1.pgdg13+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit
+current_database 
+------------------
+demo
+
+Question 6.c Dans votre rapport, expliquez comment un autre service Docker (par exemple l’API) pourrait se connecter à la base de données PostgreSQL. 
+
+Un autre service Docker, comme l’API FastAPI, peut se connecter à la base de données PostgreSQL en utilisant directement le nom du service défini dans le fichier docker-compose.yml. Dans ce cas, le hostname à utiliser est db, car Docker Compose crée automatiquement un réseau interne où chaque service est accessible par son nom.
+
+le hostname à utiliser : db
+le port : 5432
+l’utilisateur et le mot de passe : demo
+le nom de la base : demo
+
+Question 6.d  Après vos tests, vous pouvez arrêter la stack : docker compose down
+
+Si l’on ajoute l’option -v, comme dans docker compose down -v, les volumes sont également supprimés, ce qui entraîne la perte définitive des données stockées dans la base. 
