@@ -104,3 +104,51 @@ Question 4.d Arrêtez le conteneur en cours d’exécution depuis un autre termi
 Puis vérifiez qu’il n’apparaît plus dans docker ps, mais qu’il est toujours visible dans docker ps -a. Expliquez brièvement la différence entre ces deux commandes dans votre rapport. 
 
 La différence entre ces deux commandes est que docker ps affiche uniquement les conteneurs en cours d’exécution, tandis que docker ps -a montre tous les conteneurs, y compris ceux qui sont arrêtés.
+
+Exercice 5 : Démarrer un mini-système multi-conteneurs avec Docker Compose
+
+Question 5.a Organisez votre répertoire de travail de la façon suivante : 
+.
+├── api/
+│   ├── app.py         # votre fichier FastAPI
+│   └── Dockerfile     # votre Dockerfile pour l'API
+└── docker-compose.yml # à créer à la racine
+
+Question 5.b  Complétez le fichier docker-compose.yml ci-dessous.
+
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: demo
+      POSTGRES_PASSWORD: demo
+      POSTGRES_DB: demo
+    ports:
+      - "5432:5432"
+
+  api:
+    build: ./api
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+Question 3.c À la racine de votre projet (là où se trouve docker-compose.yml), lancez les services en arrière-plan : docker compose up -d
+
+Puis affichez la liste des services gérés par Docker Compose : docker compose ps
+
+![alt text](../captures/image7.png)
+
+On voit bien que les services db et api sont bien démarrés.
+
+Question 5.d Vérifiez que l’endpoint /health de l’API est toujours accessible, cette fois-ci lorsque l’API est lancée via Docker Compose : curl http://localhost:8000/health
+
+![alt text](../captures/image8.png)
+
+Question 5.e  Lorsque vous avez terminé, arrêtez et supprimez les conteneurs gérés par Docker Compose : docker compose down
+
+Expliquez dans votre rapport la différence entre : Arrêter les services avec docker compose down ; Arrêter un conteneur individuel avec docker stop <id>.
+
+J’ai arrêté proprement les services avec la commande docker compose down. Cette commande supprime tous les conteneurs, réseaux et ressources créés par Docker Compose pour cette stack. La différence avec docker stop <id> est que docker stop arrête uniquement un conteneur individuel, sans supprimer les ressources associées, tandis que docker compose down gère l’ensemble des services définis dans le fichier docker-compose.yml et remet l’environnement dans un état propre.
