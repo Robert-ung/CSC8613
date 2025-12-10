@@ -78,3 +78,29 @@ Question 3.c Construisez maintenant l’image Docker à partir du Dockerfile ave
 ![alt text](../captures/image5.png)
 
 La construction s'est bien déroulée !
+
+Exercice 4 : Exécuter l’API FastAPI dans un conteneur Docker
+
+Question 4.a Lancez un conteneur à partir de l’image simple-api en exposant le port 8000 du conteneur sur le port 8000 de votre machine. Utilisez la commande suivante : docker run -p 8000:8000 simple-api
+
+Expliquez dans votre rapport le rôle de l’option -p 8000:8000. 
+
+L’option -p 8000:8000 sert à associer le port 8000 du conteneur au port 8000 de ma machine hôte. Cela signifie que lorsque j’accède à localhost:8000 depuis mon navigateur ou avec curl, la requête est redirigée vers le service qui tourne à l’intérieur du conteneur. Cette option est indispensable pour rendre l’API accessible depuis l’extérieur du conteneur.
+
+Question 4.b Dans un autre terminal (ou via votre navigateur), appelez l’endpoint /health de l’API : curl http://localhost:8000/health
+
+![alt text](../captures/image6.png)
+
+Question 4.c Dans un autre terminal, affichez la liste des conteneurs en cours d’exécution : docker ps
+
+Identifiez la ligne correspondant au conteneur simple-api et notez dans votre rapport :
+
+    le nom du conteneur : ec9eaaf13f25
+    l'image utilisée : simple-api
+    le port mappé : 8000
+
+Question 4.d Arrêtez le conteneur en cours d’exécution depuis un autre terminal à l’aide de la commande : docker stop <nom_ou_id_du_conteneur>
+
+Puis vérifiez qu’il n’apparaît plus dans docker ps, mais qu’il est toujours visible dans docker ps -a. Expliquez brièvement la différence entre ces deux commandes dans votre rapport. 
+
+La différence entre ces deux commandes est que docker ps affiche uniquement les conteneurs en cours d’exécution, tandis que docker ps -a montre tous les conteneurs, y compris ceux qui sont arrêtés.
