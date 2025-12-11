@@ -184,3 +184,48 @@ le nom de la base : demo
 Question 6.d  Après vos tests, vous pouvez arrêter la stack : docker compose down
 
 Si l’on ajoute l’option -v, comme dans docker compose down -v, les volumes sont également supprimés, ce qui entraîne la perte définitive des données stockées dans la base. 
+
+Exercice 7 : Déboguer des conteneurs Docker : commandes essentielles et bonnes pratiques
+
+Question 7.a Affichez en continu les logs du service api exécuté par Docker Compose : docker compose logs -f api
+
+Relevez dans votre rapport ce que vous observez lorsque :
+
+l’API démarre correctement : les logs affichent les messages de lancement du serveur Uvicorn, par exemple l’indication qu’il écoute sur 0.0.0.0:8000 et qu’il est prêt à accepter des connexions.
+
+l’API reçoit une requête /health : les logs montrent une ligne supplémentaire correspondant à la requête HTTP, avec la méthode GET, le chemin /health, le code de statut 200 et le temps de réponse.
+
+![alt text](../captures/image10.png)
+
+Question 7.b Utilisez la commande ci-dessous pour ouvrir un shell sh dans le conteneur de l’API : docker compose exec api sh
+À l’intérieur du conteneur :
+ls
+python --version
+exit
+
+Expliquez dans votre rapport ce que vous observez. 
+
+la commande ls qui affiche le contenu du répertoire de travail du conteneur. On y retrouve le fichier app.py, qui correspond à l’application FastAPI, ainsi qu’un dossier __pycache__ généré automatiquement par Python pour stocker les fichiers compilés. J’ai ensuite vérifié la version de Python installée dans le conteneur avec la commande python --version. Le résultat a montré que l’environnement utilise Python 3.11.14, ce qui confirme que l’image de base choisie dans le Dockerfile est bien une image Python récente et adaptée. Enfin, j’ai quitté le shell avec la commande exit, ce qui m’a ramené à mon terminal hôte. 
+
+Question 7.c  Redémarrez seulement le service api à l’aide de la commande suivante : docker compose restart api
+
+Après redémarrage, l’API est toujours accessible sur /health.
+
+Le redémarrage d’un service est utile dans plusieurs situations. Il permet par exemple de prendre en compte des modifications de configuration ou de code sans avoir à arrêter toute la stack, de résoudre un problème ponctuel lorsque l’API ne répond plus correctement, ou encore de libérer des ressources si le conteneur est bloqué. C’est une opération légère qui ne touche qu’un service spécifique, contrairement à docker compose down qui arrête l’ensemble des services.
+
+Question 7.d Simulez un problème en introduisant volontairement une erreur dans votre fichier app.py (par exemple renommer app en appi), puis reconstruisez l’image : docker build -t simple-api .
+Relancez Docker Compose :
+docker compose up -d --build
+Observez les logs :
+docker compose logs -f api
+
+Expliquez dans votre rapport comment vous avez identifié la cause de l’erreur. 
+
+En consultant les logs avec docker compose logs -f api, j’ai observé une longue trace d’erreur qui se termine par le message NameError: name 'app' is not defined. Did you mean: 'appi'?. Ce message indique que Uvicorn cherche à lancer l’application en utilisant l’objet app défini dans le fichier app.py, mais qu’il ne le trouve pas car j’ai modifié son nom. 
+
+Question 7.e Supprimez tous les conteneurs arrêtés : docker container prune
+Supprimez toutes les images inutilisées : docker image prune
+
+Expliquez dans votre rapport pourquoi il est utile de nettoyer régulièrement son environnement Docker. 
+
+Ce nettoyage est utile pour plusieurs raisons. Tout d’abord, il permet de libérer de l’espace disque, car les conteneurs arrêtés et les images non utilisées peuvent rapidement s’accumuler et occuper une place importante. Ensuite, il améliore la lisibilité de l’environnement Docker en évitant de se retrouver avec une longue liste de ressources obsolètes qui compliquent la gestion et le diagnostic. Enfin, cela réduit les risques de confusion ou d’erreurs lors des prochains travaux, car on s’assure de ne garder que les conteneurs et les images réellement nécessaires. 
