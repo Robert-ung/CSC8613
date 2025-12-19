@@ -24,16 +24,18 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - ./services/prefect:/opt/prefect/flows
-      - ./data:/data            # enlever :ro pour rendre le volume en écriture
-      - ./services/feast_repo/repo:/repo          # Accès à Feast
+      - ./data:/data
+      - ./services/feast_repo/repo:/repo
+      - ./mlartifacts:/mlartifacts
   feast:
-    build: ./services/feast_repo          
+    build: ./services/feast_repo          # TODO: donnez le chemin de build
     depends_on:
       - postgres
     environment:
       FEAST_USAGE: "False"
     volumes:
-      - ./services/feast_repo/repo:/repo
+      - ./services/feast_repo/repo:/repo  # TODO: monter le dossier ./services/feast_repo/repo dans /repo
+  
   api:
     build: ./api
     env_file: .env
@@ -45,7 +47,23 @@ services:
     volumes:
       - ./api:/app
       - ./services/feast_repo/repo:/repo   # pour que l'API voie le repo Feast
+      - ./mlartifacts:/mlartifacts
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v2.16.0
+    command: >
+      mlflow server
+      --backend-store-uri sqlite:///mlartifacts/mlflow.db
+      --default-artifact-root /mlartifacts/artifacts
+      --host 0.0.0.0
+      --port 5000
+      --serve-artifacts
+    volumes:
+      - ./mlartifacts:/mlartifacts
+    ports:
+      - "5000:5000"
 
 
 volumes:
   pgdata:
+  mlartifacts:
