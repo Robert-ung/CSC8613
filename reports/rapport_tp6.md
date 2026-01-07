@@ -129,3 +129,8 @@ Exercice 6 : CI GitHub Actions (smoke + unit) avec Docker Compose
 Question 6.a Créez le fichier .github/workflows/ci.yml avec le workflow suivant (à copier-coller). Note : ce workflow est volontairement minimal et adapté à votre arborescence actuelle (API dans api/).
 
 Question 6.b Poussez sur GitHub (ou ouvrez une PR) pour déclencher la CI. Dans GitHub, vérifiez que les deux jobs passent.
+
+git add .
+git commit -m "Ajout CI GitHub Actions avec tests unitaires et intégration"
+git push origin main
+
