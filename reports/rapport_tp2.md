@@ -188,13 +188,17 @@ Voici une représentation simplifiée du pipeline mis en place :
                 |  (ingest_month)  |
                 +------------------+
                          |
-          +--------------+--------------+
-          |                             |
-          v                             v
-+------------------+          +------------------+
-|   Upsert tables  |          | Validation GE    |
-|   (PostgreSQL)   |          | (qualité données)|
-+------------------+          +------------------+
+                         v
+                +------------------+          
+                |   Upsert tables  |          
+                |   (PostgreSQL)   |          
+                +------------------+          
+                         |
+                         v
+                +------------------+
+                | Validation GE    |
+                | (qualité données)|
+                +------------------+
                          |
                          v
                 +------------------+
