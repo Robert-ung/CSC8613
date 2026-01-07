@@ -134,3 +134,44 @@ git add .
 git commit -m "Ajout CI GitHub Actions avec tests unitaires et intégration"
 git push origin main
 
+Question 6.c Dans votre rapport, ajoutez :
+
+Une capture GitHub Actions montrant un run qui passe
+
+![alt text](../captures/image53.png)
+
+Une phrase expliquant pourquoi on démarre Docker Compose dans la CI (tests d’intégration multi-services)
+
+On démarre Docker Compose dans la CI pour effectuer des tests d'intégration multi-services qui valident que tous les composants (PostgreSQL, Feast, MLflow, API) peuvent communiquer correctement ensemble dans un environnement isolé, reproduisant ainsi l'architecture de production et détectant les problèmes d'interconnexion avant le déploiement.
+
+Exercice 7 : Synthèse finale : boucle complète drift → retrain → promotion → serving
+
+Question 7.a Dans votre rapport, écrivez une synthèse courte (½ page) qui explique :
+
+- Comment le drift est mesuré et le rôle du seuil 0.02 (en pratique, plus élevé)
+- Comment le flow train_and_compare_flow compare val_auc et décide une promotion
+- Ce qui relève de Prefect vs GitHub Actions
+
+Boucle complète MLOps automatisée
+
+Le système mis en place réalise une boucle complète MLOps qui intègre la détection de drift, le réentraînement, l'évaluation comparative et la promotion automatisée des modèles. Le drift est mesuré grâce à Evidently qui compare statistiquement les distributions des features entre deux périodes (month_000 vs month_001), avec un seuil configuré à 2% pour déclencher le réentraînement. Ce seuil est volontairement bas pour la démonstration pour éviter des réentraînements trop fréquents et coûteux liés à des dérives mineures. Il serait calibré plus haut en production (5-10%).
+
+Lorsqu'un drift significatif est détecté, le flow train_and_compare_flow s'exécute automatiquement. Il entraîne un nouveau modèle candidat, évalue simultanément le modèle en production sur le même jeu de validation, puis applique une logique de décision basée sur la fonction should_promote() : le candidat n'est promu que si son AUC dépasse celle du modèle en production. Le modèle en production est celui avec les meilleurs performances. Cette approche  garantit que seules les améliorations conséquentes sont déployées, évitant ainsi le "ping-pong" entre versions pour des gains minimes.
+
+Rôles de Prefect vs GitHub Actions
+
+Prefect orchestre la logique métier des pipelines ML : ingestion de données, monitoring de drift, réentraînement et évaluation comparative. Il gère les dépendances entre tâches, la gestion des erreurs et l'exécution planifiée des workflows. GitHub Actions, quant à elle, assure l'intégration continue du code : validation syntaxique, tests unitaires et tests d'intégration via Docker Compose qui vérifie que tous les services communiquent correctement. Cette séparation des responsabilités permet d'avoir des tests rapides et fiables en CI, tandis que Prefect gère les workflows lourds et complexes propres au machine learning.
+
+Question 7.b Ajoutez une petite section “limites / améliorations” :
+
+- Pourquoi la CI ne doit pas entraîner le modèle complet
+- Quels tests manquent
+- Pourquoi l’approbation humaine / gouvernance est souvent nécessaire en vrai
+
+Limites et améliorations
+
+La CI ne doit pas entraîner de modèle complet car ces opérations sont trop longues (plusieurs minutes/heures), non déterministes (dépendent des données) et consommatrices de ressources. Les tests en CI doivent rester rapides (< 10 minutes) et reproductibles. Plusieurs tests manquent dans notre implémentation actuelle : tests de performance (latence, throughput), tests de robustesse (valeurs aberrantes, données manquantes), tests A/B en environnement staging, et monitoring de la dérive des prédictions (concept drift).
+
+En production réelle, une approbation humaine ou un processus de gouvernance est souvent nécessaire avant la promotion d'un modèle en Production, notamment pour des applications critiques (finances, santé, sécurité). Cette validation peut prendre la forme d'une revue par les équipes data science, de tests sur un échantillon de trafic réel, ou de vérifications réglementaires. Notre système pourrait être amélioré en ajoutant un stage "Staging" dans MLflow, avec des tests automatisés supplémentaires et une notification pour approbation manuelle.
+
+Question 7.c Pushez votre dépôt avec le tag TP6.
